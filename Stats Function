@@ -1,0 +1,715 @@
+import math
+import scipy.stats
+
+
+def mean(x):
+    new_list = []
+    for item in x:
+        new_list.append(float(item))
+    sum = 0
+    for number in new_list:
+        sum = sum + number
+    avg = sum / len(new_list)
+    return avg
+
+def median(x):
+    x.sort()
+    new_list = []
+    for item in x:
+        new_list.append(float(item))
+    if len(new_list)%2 == 0:
+        median = (new_list[len(new_list)/2] + new_list[len(new_list)/2 - 1])/2
+        return median
+    else:
+        median = len(new_list)/2
+        return x[median]
+
+
+def mode(x):
+
+    countlist = {}
+    occurances = []
+    
+    for i in x:
+        count = x.count(i)
+        countlist.update({i:count})
+    for i in countlist:
+        frequency = countlist[i]
+        occurances.append(frequency)
+    
+    m = max(occurances)
+    k = countlist.keys()
+    v = countlist.values()
+    index = v.index(m)
+    mode = k[index]
+    return mode
+    
+    
+
+
+def percentile(x, p):
+    x.sort()
+    new_list = []
+    for item in x:
+        new_list.append(float(item))
+    if p > 0 and p < 100:
+        position = p * len(new_list)/100
+        position = int(position)
+        return new_list[position]
+    elif p <= 0:
+        print "Percentile cannot be less than or equal to zero."
+    else:
+        print "Percentile cannot be more than or equal to 100"
+
+def quartile(x, q):
+    x.sort()
+    new_list = []
+    for item in x:
+        new_list.append(float(item))
+    if q == 1:
+        return percentile(new_list, 25)
+    elif q == 2:
+        return percentile(new_list, 50)
+    elif q == 3:
+        return percentile(new_list, 75)
+    else:
+        print "the quartile number must be 1, 2 or 3"
+
+def num_range(x):
+    x.sort()
+    new_list = []
+    for item in x:
+        new_list.append(float(item))
+    range = max(new_list) - min(new_list)
+    return range
+
+def iqr(x):
+    x.sort()
+    new_list = []
+    for item in x:
+        new_list.append(float(item))
+    return (quartile(new_list, 3) - quartile(new_list, 1))
+
+def var_p(x):
+    x.sort()
+    new_list = []
+    for item in x:
+        new_list.append(float(item))
+    sum = 0.0
+    for number in new_list:
+        sum = (number - mean(new_list)) ** 2 + sum
+    var = sum / len(new_list)
+    return var
+
+def var_s(x):
+    x.sort()
+    new_list = []
+    for item in x:
+        new_list.append(float(item))
+    sum = 0.0
+    for number in new_list:
+        sum = (number - mean(new_list)) ** 2 + sum
+    var = sum / (len(new_list) - 1)
+    return var
+
+def std_p(x):
+    return var_p(x) ** (1./2)
+        
+
+def std_s(x):
+    return var_s(x) ** (1./2)
+    
+def cv_p(x):
+     return std_p(x)/mean(x) * 100
+
+def cv_s(x):
+    return std_s(x)/mean(x) * 100
+
+def skewness(x):
+    sum = 0
+    for number in x:
+        sum = sum + ((number - mean(x))/std_s(x))**3.0
+    
+    n = len(x)
+    return (n * sum)/((n-1)*(n-2))
+
+def z_score(y,x):
+    zscore = (x - mean(y))/std_s(y)
+    return zscore
+     
+
+def outlier_z(seq):
+    zlist = []
+
+    for i in seq:
+        if (i-mean(seq))/std_s(seq) < -3:
+            zlist.append(i)
+        elif (i-mean(seq))/std_s(seq) > 3:
+            zlist.append(i)
+            
+        else:
+            pass
+        
+    zlist.sort()
+    
+    return zlist
+
+def outlier_iqr(seq):
+    zlist = []
+    for i in seq:
+        if i < quartile(seq, 1)-1.5*iqr(seq):
+            zlist.append(i)
+        elif i > quartile(seq,3)+1.5*iqr(seq):
+            zlist.append(i)
+        else:
+            pass
+    zlist.sort()
+    return zlist
+
+
+
+def cov_p(x,y):
+    if len(x) == len(y):
+        sum = 0
+        n = len(x)
+        
+        for i in range(0,n):
+                sum = (x[i]-mean(x))*(y[i]-mean(y)) + sum
+            
+        cov_p = sum/n
+        return cov_p
+    else:
+        return "Both lists need to be equal length"
+        
+        
+def cov_s(x,y):
+    if len(x) == len(y):
+        sum = 0
+        
+        for i in range(0,len(x)):
+                sum = (x[i]-mean(x))*(y[i]-mean(y)) + sum
+
+        cov_s = sum/(len(x)-1)
+        return cov_s
+    else:
+        return "Both lists need to be equal length"
+        
+
+def r_pearson_p(x,y):
+    if len(x) == len(y):
+        pearson_p = cov_p(x,y)/(std_p(x) * std_p(y))
+        return pearson_p
+    else:
+        return "Both list need to be equal length"
+        
+def r_pearson_s(x,y):
+    if len(x) == len(y):
+        pearson_s = cov_s(x,y)/(std_s(x) * std_s(y))
+        return pearson_s
+    else:
+        return "Both list need to be equal length"
+
+
+def factorial(x):
+    factorial = 1.0
+    while x>= 0:
+        
+        if x > 0:
+            factorial = x * factorial
+            x = x-1
+        elif x == 0:
+            return factorial
+def combination(x,y):
+    combination = factorial(x) / (factorial(y) * factorial(x-y))
+    return combination
+    
+def permutation(x,y):
+    perm = factorial(x) / factorial(x-y)
+    return perm     
+
+def binomial_dist(n,p,x,iscdf):
+    if iscdf == True:
+        sum1 = 0.0
+        while x >= 0:
+            sum1 = combination(n,x) * (p ** x) * ((1-p)**(n-x)) + sum1
+            x = x -1
+        return sum1
+    else:
+        sum2 = combination(n,x) * (p ** x) * ((1-p)** (n-x))
+        return sum2
+ 
+def poisson_dist(mu,x,iscdf):
+    if iscdf == True:
+        sum = 0
+        while x >= 0:
+            sum = math.exp(-mu)*(mu ** x)/factorial(x) + sum
+            x = x - 1
+        
+        return sum
+    else:
+        pdf = (mu ** x) * math.exp(-mu)/factorial(x)
+        return pdf
+        
+
+def hypergeometric_dist(N,r,n,x,iscdf):
+    if iscdf == True:
+        sum = 0.0
+        while x >= 0:
+            sum = combination(r,x) * combination((N-r),(n-x))/combination(N,n) + sum
+            x = x - 1
+        return sum
+    else:
+        pdf = float(combination(r,x) * combination((N-r),(n-x))/combination(N,n))
+        return pdf
+           
+
+def uniform_dist(a,b,x,d):
+    if a>b:
+        return "minimum value cannnot be greater than maximum value"
+        
+    else:
+        if d == True:
+            if x<0:
+                unidist = 0
+            elif x > b:
+                unidist = 1
+            else:
+                unidist = (x-a)/(b-a)
+        else:
+            if a<x<b:
+                unidist = a/(b-a)
+            else:
+                unidist = 0
+                
+    return unidist
+    
+def expotential_dist(mu,x,d):
+    if d == True:
+        if x >= 0:
+            expdist = 1.0 - math.exp(-mu * x)
+        else:
+            expdist = 0
+    else:
+        if x >= 0:
+            expdist = mu * math.exp(-mu * x)
+        else:
+            expdist = 0
+    
+            return expdist
+
+
+            
+def test_clt_with_uniform_dist(n,t):
+    import matplotlib.pyplot as plt
+    import random
+    
+    mean_list = []
+    for i in range(t):
+        sample_list = []
+        for j in range(n):
+            sample_list.append(random.randint(0,100)/100.0)
+        
+        mean_list.append(mean(sample_list))
+    
+    plt.hist(mean_list, bins=100, color='blue')
+    plt.title("Mean of samples")
+    plt.show()
+    return mean(mean_list), std_s(mean_list)
+    
+    
+
+    
+    
+    
+def ci_mean(list,alpha,ispop):
+    n = len(list)
+    if d == True:
+        lowerint = mean(list) - scipy.stats.norm.ppf(alpha) * std_p(list)/(n ** (1./2))
+        upperint = mean(list) + scipy.stats.norm.ppf(alpha) * std_p(list)/(n ** (1./2))
+    else:
+        lowerint = mean(list) - scipy.stats.t.ppf(alpha, n-1) + std_s(list)/(n ** (1./2))
+        upperint = mean(list) + scipy.stats.t.ppf(alpha, n-1) + std_s(list)/(n ** (1./2))
+    
+   
+    return lowerint, upperint
+
+def ci_proportion(pbar,n,alpha):
+    lowerint = pbar - scipy.stats.norm.ppf(alpha) * ((pbar*(1-pbar)/n)**(1./2))
+    if lowerint < 0:
+        lowerint = 0
+    else: 
+        pass
+    upperint = pbar + scipy.stats.norm.ppf(alpha) * ((pbar*(1-pbar)/n)**(1./2))
+    return lowerint, upperint
+
+
+"""
+
+def hypo_test_for_mean(sm, hpm, n, alpha, sd, ispop, tail):
+    from scipy import stats as st
+    if ispop == True:
+        if tail == -1:
+            ts = (sm-hpm)/(sd/(n**(1./2))
+            p = st.norm.cdf(ts)
+            critivalvalue = st.norm.ppf(alpha)
+            if p <= alpha:
+                conclusion = False
+            else:
+                conclusion = True
+        
+        elif tail == 1:
+            ts = (sm-hpm)/(sd/(n**(1./2))
+            
+            p = 1 - st.norm.cdf(ts)
+            
+            critivalvalue = st.norm.ppf(1 - alpha)
+            if p <= alpha:
+                conclusion = False
+            else: 
+                conclusion = True
+    
+        else:
+            ts = (sm-hpm)/(sd/(n**(1./2))
+            
+            p = 2 * (1 - st.norm.cdf(abs(ts)))
+            
+            critivalvalue = st.norm.ppf((1-alpha)/2)
+            if p <= alpha:
+                conclusion = False
+            else: conclusion = True
+    
+    else:
+        if tail == -1:
+            ts = (sm-hpm)/(sd/(n**(1./2))
+            
+            p = st.t.cdf(ts, n-1)
+            
+            critivalvalue = st.t.ppf(alpha, n-1)
+            if p <= alpha:
+                conclusion = False
+            else: conclusion = True
+        
+       elif tail == 1:
+           ts = (sm-hpm)/(sd/(n**(1./2))
+            
+            p = 1 - st.t.cdf(ts, n-1)
+            
+            critivalvalue = st.t.ppf(1 - alpha, n-1)
+            if p <= alpha:
+                conclusion = False
+            else: conclusion = True
+    
+        else:
+            ts = (sm-hpm)/(sd/(n**(1./2))
+            
+            p = 2 * (1 - st.t.cdf(abs(ts), n-1))
+            
+            critivalvalue = st.t.ppf((1-alpha)/2, n-1)
+            if p <= alpha:
+                conclusion = False
+            else: conclusion = True
+           
+        
+
+    return [ts, critivalvalue, p, conclusion]
+                       
+"""
+
+def hypo_test_for_proportion(sp, hpp, n, alpha, tail):
+    from scipy import stats as st
+    ts = (sp - hpp)/(hpp(1-hpp)/n)**(1./2)
+    
+    if tail == -1:
+        p = st.norm.cdf(ts)
+        critivalvalue = st.norm.ppf(alpha)
+        if p <= alpha:
+            conclusion = False
+        else:
+            conclusion = True
+    elif tail == 1:
+        p = 1-st.norm.cdf(ts)
+        critivalvalue = st.norm.ppf(1-alpha)
+        if p <= alpha:
+            conclusion = False
+        else:
+            conclusion = True
+    else:
+         p = 2 * (1 - st.norm.cdf(abs(ts)))
+         critivalvalue = st.norm.ppf((1-alpha)/2)
+         if p <= alpha:
+            conclusion = False
+         else: 
+            conclusion = True
+    
+    return [ts, critivalvalue, p, conclusion]
+
+def power_in_hypo_test_for_mean(bm, hpm, n, alpha, sd, ispop, tail):
+    from scipy import stats as st
+    if ispop == True:
+        if tail == -1:
+           
+            ts = (c-hpm)/(sd/n**(1./2))
+            
+            power = 1- st.norm.cdf(ts)
+            
+        elif tail == 1:
+           ts = (c-hpm)/(sd/n**(1./2))
+            
+           power = st.norm.cdf(ts)
+        else:
+           ts = (c-hpm)/(sd/n**(1./2))
+            
+           power = 2*(st.norm.cdf(abs(ts)))
+    else:
+        if tail == -1:
+            ts = (c-hpm)/(sd/n**(1./2))
+            
+            power = 1- st.t.cdf(ts, n-1)
+        elif tail == 1:
+            ts = (c-hpm)/(sd/n**(1./2))
+            
+            power = st.t.cdf(ts,n-1)
+        else:
+            ts = (c-hpm)/(sd/n**(1./2))
+            
+            power = 2*(st.t.cdf(abs(ts), n-1))
+           
+    return power
+    
+def ci_for_mean_difference(sm, ss, sd, alpha, ispop):
+    from scipy import stats as st
+    x = sd[0]**(2.)/ss[0]
+    y = sd[1]**(2.)/ss[1]
+    if ispop == True:
+       
+        df = ((x+y)**(2))/((1/(ss[0]-1))(x**2)+(1/(ss[1]-1))(y**2))
+        moe = st.t.ppf((alpha/2),df)
+        lowerint = sm[0]-sm[1]-moe*(x+y)**(1./2)
+        upperint = sm[0]-sm[1]+moe*(x+y)**(1./2)
+    else:
+        error = st.norm.ppf(alpha/2)
+        se = (x+y)**(1./2)
+        lowerint = sm[0]-sm[1]-error*se
+        upperint = sm[0]-sm[1]+error*se
+
+    return lowerint, upperint
+    
+def hypo_test_for_mean_difference(sm, ss, sd, alpha, ispop, diff, tail):
+    from scipy import stats as st
+    x = sd[0]**(2.)/ss[0]
+    y = sd[1]**(2.)/ss[1]
+    if ispop == True:
+        if tail == -1:
+            ts = (sm[0]-sm[1]-diff)/(x+y)**(1./2)
+            
+            p = st.norm.cdf(ts)
+            
+            critivalvalue = st.norm.ppf(alpha)
+            if p <= alpha:
+                conclusion = False
+            else: conclusion = True
+        
+        elif tail == 1:
+           ts = (sm[0]-sm[1]-diff)/(x+y)**(1./2)
+            
+           p = 1 - st.norm.cdf(ts)
+            
+           critivalvalue = st.norm.ppf(1 - alpha)
+           if p <= alpha:
+               conclusion = False
+           else:
+               conclusion = True
+    
+        else:
+            ts = (sm[0]-sm[1]-diff)/(x+y)**(1./2)
+            
+            p = 2 * (1 - st.norm.cdf(abs(ts)))
+            
+            critivalvalue = st.norm.ppf((1-alpha)/2)
+            if p <= alpha:
+                conclusion = False
+            else: conclusion = True
+    
+    else:
+        df = ((x+y)**(2))/((1/(ss[0]-1))(x**2)+(1/(ss[1]-1))(y**2))
+        if tail == -1:
+            ts = (sm[0]-sm[1]-diff)/(x+y)**(1./2)
+            
+            p = st.t.cdf(ts, df)
+            
+            critivalvalue = st.t.ppf(alpha, df)
+            if p <= alpha:
+                conclusion = False
+            else: conclusion = True
+        
+        elif tail == 1:
+           ts = (sm[0]-sm[1]-diff)/(x+y)**(1./2)
+            
+           p = 1 - st.t.cdf(ts, df)
+            
+           critivalvalue = st.t.ppf(1 - alpha, df)
+           if p <= alpha:
+               conclusion = False
+           else:
+               conclusion = True
+    
+        else:
+            ts = (sm[0]-sm[1]-diff)/(x+y)**(1./2)
+            
+            p = 2 * (1 - st.t.cdf(abs(ts), df))
+            
+            critivalvalue = st.t.ppf((1-alpha)/2, df)
+            if p <= alpha:
+                conclusion = False
+            else:
+                conclusion = True
+           
+        
+
+    return [ts, critivalvalue, p, conclusion]
+        
+def ci_for_proportion_difference(sp, n, alpha):
+    from scipy import stats as st
+    x = sp[0](1-sp[0])/n[0]
+    y = sp[1](1-sp[1])/n[1]
+
+    z = st.norm.ppf(alpha/2)
+    se = (x+y)**(1./2)
+    lowerint = sp[0]-sp[1]-z*se
+    upperint = sp[0]-sp[1]+z*se
+
+    return lowerint, upperint
+
+def hypo_test_for_proportion_difference(sp, ss, alpha, tail):
+    from scipy import stats as st
+    x = sp[0]**(2.)/ss[0]
+    y = sp[1]**(2.)/ss[1]
+    if tail == -1:
+        ts = (sp[0]-sp[1])/(x+y)**(1./2)
+            
+        p = st.norm.cdf(ts)
+            
+        critivalvalue = st.norm.ppf(1-alpha)
+        if p <= alpha:
+            conclusion = False
+        else: 
+            conclusion = True
+        
+    elif tail == 1:
+        ts = (sp[0]-sp[1])/(x+y)**(1./2)
+            
+        p = 1-st.norm.cdf(ts)
+            
+        critivalvalue = st.norm.ppf(alpha)
+        if p <= alpha:
+            conclusion = False
+        else: 
+            conclusion = True
+    
+    else:
+        ts = (sp[0]-sp[1])/(x+y)**(1./2)
+            
+        p = 2 * (1 - st.norm.cdf(abs(ts)))
+            
+        critivalvalue = st.norm.ppf((1-alpha)/2)
+        if p <= alpha:
+            conclusion = False
+        else: 
+            conclusion = True
+    
+        
+
+    return [ts, critivalvalue, p, conclusion]     
+    
+
+def co_for_population_var(sv, ss, alpha):
+    from scipy import stats as st
+    lowerchi2 = st.chi2.cdf(alpha/2,ss-1)
+    upperchi2 = st.chi2.cdf((1-alpha)/2, ss-1)
+    
+    lowerint = (ss-1)*sv/lowerchi2
+    upperint = (ss-1)*sv/upperchi2
+
+    return lowerint, upperint
+
+    
+def hypo_test_for_population_test(sv, hv, ss, alpha, tail):
+    from scipy import stats as st
+    if tail == -1:
+        ts = (ss-1)(sv**2)/hv**2
+            
+        p = st.chi2.cdf(ts, ss-1)
+            
+        critivalvalue = st.chi2.ppf(alpha, ss-1)
+        if p <= alpha:
+            conclusion = False
+        else: 
+            conclusion = True
+        
+    elif tail == 1:
+        ts = (ss-1)(sv**2)/hv**2
+            
+        p = 1 - st.chi2.cdf(ts, ss-1)
+            
+        critivalvalue = st.chi2.ppf(1 - alpha, ss-1)
+        if p <= alpha:
+            conclusion = False
+        else: 
+            conclusion = True
+    
+    else:
+        ts = (ss-1)(sv**2)/hv**2
+            
+        p = 2 * (1 - st.chi2.cdf(abs(ts), ss-1))
+            
+        critivalvalue = st.chi2.ppf((1-alpha)/2, ss-1)
+        if p <= alpha:
+            conclusion = False
+        else: 
+            conclusion = True
+           
+        
+
+    return [ts, critivalvalue, p, conclusion]
+    
+
+def hypo_test_for_two_population_var(sv, ss, alpha, tail):
+    from scipy import stats as st
+    df = (ss[0]-1)/(ss[1]-1)
+    ts = sv[0]**2/ss[1]**2
+    if tail == -1:
+            
+        p = st.f.cdf(ts, df)
+            
+        critivalvalue = st.f.ppf(alpha, df)
+        if p <= alpha:
+            conclusion = False
+        else: 
+            conclusion = True
+        
+    elif tail == 1:
+            
+        p = 1 - st.f.cdf(ts, df)
+            
+        critivalvalue = st.f.ppf(1 - alpha, df)
+        if p <= alpha:
+            conclusion = False
+        else: 
+            conclusion = True
+    
+    else:
+            
+        p = 2 * (1 - st.f.cdf(abs(ts), df))
+            
+        critivalvalue = st.f.ppf((1-alpha)/2, df)
+        if p <= alpha:
+            conclusion = False
+        else: 
+            conclusion = True
+           
+        
+
+    return [ts, critivalvalue, p, conclusion]
+    
+ 
+
